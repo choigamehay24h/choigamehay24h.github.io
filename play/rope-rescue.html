@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Rope Rescue</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://rope-rescue.game-files.crazygames.com/gameframe/up-aps/aps-script-1.4.20.html?game_slug=rope-rescue&apsType=unity&unityRawIDBId=https://rope-rescue.game-files.crazygames.com/unity/unity2020";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.crazygames.com');
+          newHeaders.set('Referer', 'https://www.crazygames.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://jogosweb-brasil24.netlify.app/brainrot-mega-parkour.html" target="_blank" rel="noopener">Brainrot Mega Parkour</a>
+  <a href="https://mir-igr-onlayn.pages.dev/find-steal-brainrot-67-game.html" target="_blank" rel="noopener">Find Steal Brainrot 67 Game</a>
+  <a href="https://koreagame-webhub.github.io/palm-island-solitaire.html" target="_blank" rel="noopener">Palm Island Solitaire</a>
+  <a href="https://jeuxflash-france.netlify.app/stunt-car-extreme-2.html" target="_blank" rel="noopener">Stunt Car Extreme 2</a>
+</custom-links></footer></body>
+</html>
